@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Kanshii</title>
+	<script>
+		var comp_line_url = "{{ url_for('compare_line') }}";
+		var reset_line_url = "{{ url_for('reset_line') }}";
+		var uuid = "{{ uuid }}";
+	</script>
+</head>
+<body>
+	<img id="best_match_img" src="static/kanji/0f9a8.svg">
+	<canvas id="pad" width="400" height="400" style="border: 1px solid red"></canvas>
+	<button id="reset-btn">Reset</button>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="{{ url_for('static', filename='checker.js') }}"></script>
+</body>
+</html>
