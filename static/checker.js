@@ -2,29 +2,31 @@ var canvas, ctx;
 var writing = false;
 var currX, currY;
 var currLine = []
+var pad;
 
 function getMouseX(e) {
-	return e.clientX - canvas.offsetLeft;
+	return e.clientX - pad.offset().left;
 }
 
 function getMouseY(e) {
-	return e.clientY - canvas.offsetTop;
+	return e.clientY - pad.offset().top;
 }
 
 function init() {
-	canvas = document.getElementById("pad");
+	canvas = document.getElementById("write-pad");
 	ctx = canvas.getContext("2d");
+	pad = $('#write-pad');
 
 	$('#reset-btn').click(reset)
 
-	$('#pad').mousedown(function (e) {
+	pad.mousedown(function (e) {
 		writing = true;
 		currX = getMouseX(e);
 		currY = getMouseY(e);
 		ctx.beginPath(currX, currY);
 	});
 
-	$('#pad').mouseup(function (e) {		
+	pad.mouseup(function (e) {		
 		if (writing) {
 			writing = false;
 			var res = getLineType(currLine);
@@ -34,15 +36,17 @@ function init() {
 		}
 	});
 
-	$('#pad').mouseout(function (e) {
+	pad.mouseout(function (e) {
 		if (writing) {
 			writing = false;
+			var res = getLineType(currLine);
 			currLine = []
-			getLineType(currLine);
+			if (res == null) return;
+			sendLine(res);
 		}
 	});
 
-	$('#pad').mousemove(function (e) {
+	pad.mousemove(function (e) {
 		if (writing) {
 			var x = getMouseX(e);
 			var y = getMouseY(e);
@@ -54,6 +58,10 @@ function init() {
 			currLine.push([x, y]);
 		}
 	});
+}
+
+function lerp(min, max, p) {
+	return min + (max - min) * p;
 }
 
 function sendLine(line) {
@@ -69,15 +77,27 @@ function sendLine(line) {
 		data: JSON.stringify(data),
 		dataType: "json",
 		success: function(response) {
-			$('#best_match_img').attr("src", response.best)
-		},
-		error: function(err) {
-			console.log(err);
+			max = response[0].score;
+			min = response[response.length-1].score;
+
+			$('.best_match_img').each(function(idx, val) {
+				if (idx >= response.length) {
+					$(this).css('opacity', 0.1);
+					return;
+				}
+
+				var p = (response[idx].score - min) / (max - min)
+				var bestRatio = response[idx].score / response[0].score
+				$(this).attr("src", response[idx].img)
+				$(this).css('opacity', lerp(0.25, 1, p));
+			});
 		}
 	});
 }
 
 function getLineType(line) {
+	if (line.length == 0) return;
+
 	var firstPoint = line[0];
 	var lastPoint = line[line.length-1];
 	var vec = [lastPoint[0]-firstPoint[0], lastPoint[1]-firstPoint[1]];

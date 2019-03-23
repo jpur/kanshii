@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Kanshii</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 	<script>
 		var comp_line_url = "{{ url_for('compare_line') }}";
 		var reset_line_url = "{{ url_for('reset_line') }}";
@@ -9,9 +10,15 @@
 	</script>
 </head>
 <body>
-	<img id="best_match_img" src="static/kanji/0f9a8.svg">
-	<canvas id="pad" width="400" height="400" style="border: 1px solid red"></canvas>
-	<button id="reset-btn">Reset</button>
+	<div id="write-container">
+		<div class="best-img-col">
+			<img class="best_match_img" src="static/kanji/0f9a8.svg">
+			<img class="best_match_img" src="static/kanji/0f9a8.svg">
+			<img class="best_match_img" src="static/kanji/0f9a8.svg">
+		</div> 
+		<canvas id="write-pad" width="400" height="400"></canvas>
+		<button id="reset-btn" class="write-btn">Reset</button>
+	</div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="{{ url_for('static', filename='checker.js') }}"></script>
