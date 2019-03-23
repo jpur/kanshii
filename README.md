@@ -1,5 +1,5 @@
 # Kanshii
-A website which tries to identify drawn kanji using line properties.
+A web app which tries to identify drawn kanji using line properties rather than pixel data.
 
 ![GIF](https://user-images.githubusercontent.com/9266693/54827658-9d8e4500-4d06-11e9-9472-1e3204f16310.gif)
 
