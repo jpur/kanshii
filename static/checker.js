@@ -88,7 +88,7 @@ function sendLine(line) {
 
 				var p = (response[idx].score - min) / (max - min)
 				var bestRatio = response[idx].score / response[0].score
-				$(this).attr("src", response[idx].img)
+				$(this).attr("src", kanji_url + "/" + response[idx].img)
 				$(this).css('opacity', lerp(0.25, 1, p));
 			});
 		}

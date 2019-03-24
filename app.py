@@ -1,17 +1,10 @@
 import os
 import math
-import sys
 import uuid
 import xml.etree.ElementTree
-import queue
-from collections import defaultdict
+from analyzer import Analyzer
 from flask import Flask, render_template, request, jsonify, url_for
 from svg.path import Path, parse_path
-
-class DrawData:
-	def __init__(self):
-		self.candidates = defaultdict(int)
-		self.strokeCount = 0
 
 strokes = []
 kanji = {}
@@ -41,55 +34,21 @@ def calculate_paths():
 @app.route('/')
 def index():
 	uid = uuid.uuid4()
-	user_data[uid] = DrawData()
+	user_data[uid] = Analyzer(3)
 	return render_template('index.html', uuid=uid)
 
 @app.route('/reset_line', methods=['POST'])
 def reset_line():
 	uid = uuid.UUID(request.get_json()['uuid'])
-	user_data[uid].strokeCount = 0
-	user_data[uid].candidates.clear()
+	user_data[uid] = Analyzer(3)
 	return jsonify(result='Success')
 
 @app.route('/compare_line', methods=['POST'])
 def compare_line():
 	uid = uuid.UUID(request.get_json()['uuid'])
-	data = user_data[uid]
+	analyzer = user_data[uid]
 
 	req = request.get_json();
 	vec = complex(req['line'][0], req['line'][1])
 	
-	for sset in strokes:
-		if len(sset[1]) <= data.strokeCount:
-			continue
-
-		# We'll clean this up later
-		s = sset[1][data.strokeCount]
-		dot = s.real * vec.real + s.imag * vec.imag
-		if abs(dot) > 0.95:
-			data.candidates[sset[0]] += 2
-		elif abs(dot) > 0.8:
-			data.candidates[sset[0]] += 1
-		elif abs(dot) < 0.2:
-			data.candidates[sset[0]] = -100
-
-	data.strokeCount += 1
-
-
-	pq = queue.PriorityQueue(max_matches)
-	best = None
-	bestRat = -sys.maxsize - 1
-	for k, v in data.candidates.items():
-		if v >= bestRat and len(kanji[k]) == data.strokeCount:
-			bestRat = v
-			best = k
-			if pq.full():
-				pq.get()
-			pq.put((bestRat, best))
-
-	res = []
-	while not pq.empty():
-		n = pq.get()
-		res.append({ 'score': n[0], 'img': url_for('static', filename='kanji/' + n[1]) })
-
-	return jsonify(res[::-1])
+	return jsonify(analyzer.next(vec, strokes, kanji))
