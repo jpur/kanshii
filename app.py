@@ -2,9 +2,13 @@ import os
 import math
 import uuid
 import xml.etree.ElementTree
+import helper
 from analyzer import Analyzer
 from flask import Flask, render_template, request, jsonify, url_for
 from svg.path import Path, parse_path
+from collections import namedtuple
+
+Stroke = namedtuple('Stroke', 'start uvec')
 
 strokes = []
 kanji = {}
@@ -23,10 +27,10 @@ def calculate_paths():
 			path = parse_path(stroke.attrib['d'])
 
 			# Add unit vector of path between start and end points to stroke set
-			p_vec = path.point(1)-path.point(0)
-			mag = math.sqrt(p_vec.real**2 + p_vec.imag**2)
-			p_uvec = complex(p_vec.real/mag, p_vec.imag/mag) if mag else complex(0, 0)
-			strokeSet.append(p_uvec)
+			p_vec = path.point(1) - path.point(0)
+			p_uvec = helper.complex_uvec(p_vec)
+			obj = Stroke(path.point(0), p_uvec)
+			strokeSet.append(obj)
 
 		strokes.append((fname, strokeSet))
 		kanji[fname] = strokeSet
@@ -49,6 +53,9 @@ def compare_line():
 	analyzer = user_data[uid]
 
 	req = request.get_json();
-	vec = complex(req['line'][0], req['line'][1])
+	uvec = complex(req['line']['uvec'][0], req['line']['uvec'][1])
+	start = complex(req['line']['start'][0], req['line']['start'][1])
+
+	stroke = Stroke(start, uvec)
 	
-	return jsonify(analyzer.next(vec, strokes, kanji))
+	return jsonify(analyzer.next(stroke, strokes, kanji))

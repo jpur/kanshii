@@ -119,7 +119,7 @@ function getLineType(line) {
 		drift += Math.sqrt(Math.pow(udir[0]-uvec[0], 2) + Math.pow(udir[1]-uvec[1], 2));
 	}
 
-	return uvec;
+	return { 'uvec': uvec, 'start': firstPoint };
 }
 
 function reset() {
@@ -127,7 +127,7 @@ function reset() {
 		type: "POST",
 		url: reset_line_url,
 		contentType: "application/json",
-		data: JSON.stringify({ "uuid": uuid}),
+		data: JSON.stringify({ "uuid": uuid }),
 		dataType: "json",
 		success: function(response) {
 			ctx.clearRect(0, 0, canvas.width, canvas.height)
