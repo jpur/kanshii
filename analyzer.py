@@ -17,7 +17,7 @@ class Analyzer:
 
 		count_stroke = stroke_set[self.stroke_count]
 
-		# Dot product of new stroke and corresponding stroke in kanji. We'll clean this up later. For now, we ignore negative/positive diffs.
+		# Dot product of new stroke and corresponding stroke in kanji. For now, we ignore negative/positive diffs.
 		sim = abs(helper.complex_dot(count_stroke.uvec, next_stroke.uvec))
 		if self.stroke_count > 0:
 			# Unit vector between current and previous stroke in kanji we're checking

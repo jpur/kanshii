@@ -49,13 +49,12 @@ def reset_line():
 
 @app.route('/compare_line', methods=['POST'])
 def compare_line():
-	uid = uuid.UUID(request.get_json()['uuid'])
-	analyzer = user_data[uid]
-
 	req = request.get_json();
+	uid = uuid.UUID(req['uuid'])
+	analyzer = user_data[uid]
+	
 	uvec = complex(req['line']['uvec'][0], req['line']['uvec'][1])
 	start = complex(req['line']['start'][0], req['line']['start'][1])
-
 	stroke = Stroke(start, uvec)
 	
 	return jsonify(analyzer.next(stroke, strokes, kanji))
