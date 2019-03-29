@@ -80,16 +80,16 @@ function sendLine(line) {
 			max = response[0].score;
 			min = response[response.length-1].score;
 
-			$('.best_match_img').each(function(idx, val) {
+			$('.best-match').each(function(idx, val) {
 				if (idx >= response.length) {
 					$(this).css('opacity', 0.1);
 					return;
 				}
 
-				var p = (response[idx].score - min) / (max - min)
-				var bestRatio = response[idx].score / response[0].score
-				$(this).attr("src", kanji_url + "/" + response[idx].img)
-				$(this).css('opacity', lerp(0.25, 1, p));
+				var p = (response[idx].score - min) / (max - min);
+				var bestRatio = response[idx].score / response[0].score;
+				$(this).children('.best-match-img').attr("src", kanji_url + "/" + response[idx].img)
+				$(this).children('.best-match-img').css('opacity', lerp(0.25, 1, p));
 			});
 		}
 	});

@@ -48,13 +48,8 @@ class Analyzer:
 
 		# Get best matching best_max_size kanji
 		pq = []
-		bestRat = -sys.maxsize - 1
 		for k, v in self.candidates.items():
-			if v >= bestRat and len(kanji[k]) == self.stroke_count:
-				if len(pq) == self.best_max_size:
-					heapq.heapreplace(pq, (v, k)) 
-				else:
-					heapq.heappush(pq, (v, k))
-				bestRat = pq[0][0]
+			if len(kanji[k]) == self.stroke_count:
+				heapq.heappush(pq, (v, k))
 		
-		return [{ 'score': pq[i][0], 'img': pq[i][1] } for i in range(len(pq)-1, -1, -1)]
+		return [{ 'score': n[0], 'img': n[1] } for n in heapq.nlargest(3, pq)]
