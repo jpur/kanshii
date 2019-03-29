@@ -1,7 +1,7 @@
 from collections import defaultdict
-import queue
 import sys
 import helper
+import heapq
 
 class Analyzer:
 	def __init__(self, best_max_size):
@@ -30,35 +30,31 @@ class Analyzer:
 
 		return sim
 
-	def next(self, next_stroke, kanji_list, kanji_dict):
-		for k in kanji_list:
-			sim = self.get_similarity(next_stroke, k[1])
+	def next(self, next_stroke, kanji):
+		for k, v in kanji.items():
+			sim = self.get_similarity(next_stroke, v)
 			if sim < 0: 
 				continue
 
 			if abs(sim) > 0.95:
-				self.candidates[k[0]] += 2
+				self.candidates[k] += 2
 			elif abs(sim) > 0.8:
-				self.candidates[k[0]] += 1
+				self.candidates[k] += 1
 			elif abs(sim) < 0.2:
-				self.candidates[k[0]] = -100
+				self.candidates[k] = -100
 
 		self.stroke_count += 1
 		self.strokes.append(next_stroke)
 
 		# Get best matching best_max_size kanji
-		pq = queue.PriorityQueue(self.best_max_size)
+		pq = []
 		bestRat = -sys.maxsize - 1
 		for k, v in self.candidates.items():
-			if v >= bestRat and len(kanji_dict[k]) == self.stroke_count:
-				bestRat = v
-				if pq.full():
-					pq.get()
-				pq.put((bestRat, k))
-
-		res = []
-		while not pq.empty():
-			n = pq.get()
-			res.append({ 'score': n[0], 'img': n[1] })
-
-		return res[::-1]
+			if v >= bestRat and len(kanji[k]) == self.stroke_count:
+				if len(pq) == self.best_max_size:
+					heapq.heapreplace(pq, (v, k)) 
+				else:
+					heapq.heappush(pq, (v, k))
+				bestRat = pq[0][0]
+		
+		return [{ 'score': pq[i][0], 'img': pq[i][1] } for i in range(len(pq)-1, -1, -1)]

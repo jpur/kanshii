@@ -10,7 +10,6 @@ from collections import namedtuple
 
 Stroke = namedtuple('Stroke', 'start uvec')
 
-strokes = []
 kanji = {}
 user_data = {}
 max_matches = 3
@@ -29,10 +28,8 @@ def calculate_paths():
 			# Add unit vector of path between start and end points to stroke set
 			p_vec = path.point(1) - path.point(0)
 			p_uvec = helper.complex_uvec(p_vec)
-			obj = Stroke(path.point(0), p_uvec)
-			strokeSet.append(obj)
+			strokeSet.append(Stroke(path.point(0), p_uvec))
 
-		strokes.append((fname, strokeSet))
 		kanji[fname] = strokeSet
 
 @app.route('/')
@@ -57,4 +54,4 @@ def compare_line():
 	start = complex(req['line']['start'][0], req['line']['start'][1])
 	stroke = Stroke(start, uvec)
 	
-	return jsonify(analyzer.next(stroke, strokes, kanji))
+	return jsonify(analyzer.next(stroke, kanji))
