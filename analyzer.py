@@ -24,7 +24,7 @@ class Analyzer:
 			a = helper.complex_uvec(count_stroke.start - stroke_set[self.stroke_count - 1].start)
 			# Unit vector between next stroke and previous stroke in our analyzer
 			b = helper.complex_uvec(next_stroke.start - self.strokes[-1].start)
-			# This contributes to the similarity somehow ..
+			# This contributes to the similarity by weighting similar previous line angles
 			sim2 = abs(helper.complex_dot(a, b))
 			sim = sim * 0.75 + sim2 * 0.25
 
